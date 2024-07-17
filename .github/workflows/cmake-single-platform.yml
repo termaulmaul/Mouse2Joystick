@@ -1,0 +1,66 @@
+name: CMake on macOS ARM
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    # Run the job on macOS ARM (M1)
+    runs-on: macos-12
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+        fetch-depth: 1
+
+    - name: Install Homebrew dependencies
+      run: |
+        brew update
+        brew install cmake
+
+    - name: Create CMakeLists.txt
+      run: |
+        echo "cmake_minimum_required(VERSION 3.10)
+        project(MyProject)
+
+        # Add executable
+        add_executable(my_executable main.cpp)" > ${{github.workspace}}/CMakeLists.txt
+
+    - name: Create workflow_file.yaml
+      run: |
+        echo "jobs:
+  build:
+    runs-on: macos-12
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+        fetch-depth: 1
+
+    - name: Install Homebrew dependencies
+      run: |
+        brew update
+        brew install cmake
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --config Release" > ${{github.workspace}}/workflow_file.yaml
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build build --config ${{env.BUILD_TYPE}}
