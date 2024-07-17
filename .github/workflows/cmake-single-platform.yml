@@ -35,30 +35,6 @@ jobs:
         # Add executable
         add_executable(my_executable main.cpp)" > ${{github.workspace}}/CMakeLists.txt
 
-    - name: Create workflow_file.yaml
-      run: |
-        echo 'jobs:
-  build:
-    runs-on: macos-12
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: true
-        fetch-depth: 1
-
-    - name: Install Homebrew dependencies
-      run: |
-        brew update
-        brew install cmake
-
-    - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
-
-    - name: Build
-      run: cmake --build build --config Release' > ${{github.workspace}}/workflow_file.yaml
-
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
